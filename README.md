@@ -1,7 +1,7 @@
 ```markdown
 # Meal Planner
 
-Meal Planner is a user-friendly web application designed to help families efficiently organize their weekly meals. Users can plan a weekly menu using recipes from a customizable database, with features such as recipe management, filtering, and database cleaning to provide a smooth and personalized meal planning experience.
+Meal Planner is a user-friendly web application designed to assist families in organizing their weekly meals efficiently. The application allows users to plan a weekly menu using recipes from a customizable database. It includes features such as recipe management, filtering, and database cleaning to ensure a smooth and personalized meal planning experience.
 
 ## Overview
 

@@ -1,0 +1,29 @@
+.filter-form {
+  margin-bottom: 2rem;
+  max-width: 400px; /* Reduced the maximum width */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.filter-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.filter-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.filter-form input,
+.filter-form select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-check {
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  width: 45%; /* Reduced the width of checkboxes */
+}

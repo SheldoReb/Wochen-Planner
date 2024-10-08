@@ -1,0 +1,19 @@
+.recipe-edit-form {
+  margin-bottom: 2rem;
+}
+
+.recipe-edit-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.recipe-edit-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-edit-form input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

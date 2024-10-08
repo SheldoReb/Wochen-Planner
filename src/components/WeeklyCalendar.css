@@ -1,0 +1,29 @@
+/* src/components/WeeklyCalendar.css */
+.weekly-calendar {
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.day-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.day-card .card-body {
+  padding: 1rem;
+}
+
+.btn-warning {
+  background-color: #f0ad4e;
+  border-color: #eea236;
+}
+
+.btn-danger {
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+
+.modal-content {
+  border-radius: 8px;
+}
