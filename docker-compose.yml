@@ -16,6 +16,6 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "9988:80"
     depends_on:
       - backend
