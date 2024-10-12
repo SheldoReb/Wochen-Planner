@@ -1,6 +1,7 @@
 import express from 'express';
 import Recipe from '../models/Recipe.mjs';
 import Joi from 'joi';
+import WeeklyRecipes from '../models/WeeklyRecipes.js';
 
 const router = express.Router();
 
@@ -205,6 +206,31 @@ router.post('/random', async (req, res) => {
     res.json(randomRecipe);
   } catch (error) {
     console.error('Error fetching random recipe:', error.message, error.stack);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Save weekly recipes
+router.post('/weekly-recipes', async (req, res) => {
+  const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = req.body;
+
+  try {
+    const weeklyRecipes = new WeeklyRecipes({ monday, tuesday, wednesday, thursday, friday, saturday, sunday });
+    await weeklyRecipes.save();
+    res.status(201).json({ message: 'Weekly recipes saved successfully' });
+  } catch (error) {
+    console.error('Error saving weekly recipes:', error.message, error.stack);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Load weekly recipes
+router.get('/weekly-recipes', async (req, res) => {
+  try {
+    const weeklyRecipes = await WeeklyRecipes.findOne().populate('monday tuesday wednesday thursday friday saturday sunday');
+    res.json(weeklyRecipes);
+  } catch (error) {
+    console.error('Error loading weekly recipes:', error.message, error.stack);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
