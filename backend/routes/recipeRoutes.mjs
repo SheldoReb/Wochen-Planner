@@ -1,13 +1,22 @@
 import express from 'express';
 import Recipe from '../models/Recipe.mjs';
 import Joi from 'joi';
+import WeeklyRecipes from '../models/WeeklyRecipes.js';
 
 const router = express.Router();
 
 // Define a schema for recipe validation
 const recipeSchema = Joi.object({
   name: Joi.string().min(3).required(),
-  image: Joi.string().uri().optional(),
+  url: Joi.string().required().custom((value, helpers) => {
+    try {
+      new URL(value);
+      return value;
+    } catch (err) {
+      return helpers.error('any.invalid');
+    }
+  }, 'URL validation'),
+  image: Joi.string().optional(),
   prepTime: Joi.string().optional(),
   difficulty: Joi.string().valid('Easy', 'Medium', 'Hard').optional(),
   cuisine: Joi.string().min(3).required(),
@@ -45,7 +54,6 @@ router.post('/upload', async (req, res) => {
     return res.status(400).json({ message: 'Invalid data format. Expected an array of recipes.' });
   }
 
-  // Validate each recipe against the schema
   const invalidRecipes = recipes.filter(recipe => {
     const { error } = recipeSchema.validate(recipe);
     if (error) {
@@ -167,6 +175,65 @@ router.delete('/clean-duplicates', async (req, res) => {
     res.json({ message: 'Database cleaned successfully', duplicatesRemoved: totalRemoved });
   } catch (error) {
     console.error('Error cleaning duplicates:', error.message, error.stack);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add this new endpoint to fetch a random recipe with filters
+router.post('/random', async (req, res) => {
+  const { cuisineTypes, dietaryRestrictions, prepTime, difficulty, mainIngredient } = req.body;
+
+  try {
+    // Build the query based on filters
+    const query = {
+      ...(cuisineTypes && cuisineTypes.length > 0 && { cuisine: { $in: cuisineTypes } }),
+      ...(dietaryRestrictions && { dietaryRestrictions }),
+      ...(prepTime && { prepTime }),
+      ...(difficulty && { difficulty }),
+      ...(mainIngredient && { mainIngredient }),
+    };
+
+    // Fetch all recipes matching the filters
+    const recipes = await Recipe.find(query);
+
+    if (recipes.length === 0) {
+      return res.status(404).json({ error: 'No recipes found with the given filters' });
+    }
+
+    // Select a random recipe from the filtered list
+    const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+
+    res.json(randomRecipe);
+  } catch (error) {
+    console.error('Error fetching random recipe:', error.message, error.stack);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Save weekly recipes
+router.post('/weekly-recipes', async (req, res) => {
+  const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = req.body;
+
+  try {
+    const weeklyRecipes = await WeeklyRecipes.findOneAndUpdate(
+      {},
+      { monday, tuesday, wednesday, thursday, friday, saturday, sunday },
+      { new: true, upsert: true } // Create a new document if none exists
+    );
+    res.status(201).json({ message: 'Weekly recipes saved successfully', weeklyRecipes });
+  } catch (error) {
+    console.error('Error saving weekly recipes:', error.message, error.stack);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Load weekly recipes
+router.get('/weekly-recipes', async (req, res) => {
+  try {
+    const weeklyRecipes = await WeeklyRecipes.findOne();
+    res.json(weeklyRecipes);
+  } catch (error) {
+    console.error('Error loading weekly recipes:', error.message, error.stack);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -9,7 +9,11 @@ const RecipeForm = ({ recipe, handleChange, handleSubmit, handleFileUpload, isEd
         <input type="text" name="name" value={recipe.name} onChange={handleChange} required />
       </div>
       <div className="form-group">
-        <label>Image URL</label>
+        <label>URL</label>
+        <input type="text" name="url" value={recipe.url} onChange={handleChange} required />
+      </div>
+      <div className="form-group">
+        <label>Image</label>
         <input type="text" name="image" value={recipe.image} onChange={handleChange} />
       </div>
       <div className="form-group">
@@ -22,7 +26,7 @@ const RecipeForm = ({ recipe, handleChange, handleSubmit, handleFileUpload, isEd
       </div>
       <div className="form-group">
         <label>Cuisine</label>
-        <input type="text" name="cuisine" value={recipe.cuisine} onChange={handleChange} required />
+        <input type="text" name="cuisine" value={recipe.cuisine} onChange={handleChange} />
       </div>
       <div className="form-group">
         <label>Dietary Restrictions</label>
@@ -48,16 +52,17 @@ const RecipeForm = ({ recipe, handleChange, handleSubmit, handleFileUpload, isEd
 RecipeForm.propTypes = {
   recipe: PropTypes.shape({
     name: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired, // Added url as required
     image: PropTypes.string,
     prepTime: PropTypes.string,
     difficulty: PropTypes.string,
-    cuisine: PropTypes.string.isRequired,
+    cuisine: PropTypes.string,
     dietaryRestrictions: PropTypes.string,
-    mainIngredient: PropTypes.string,
+    mainIngredient: PropTypes.string
   }).isRequired,
   handleChange: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
-  handleFileUpload: PropTypes.func,  // Ensure this is included for non-editing mode
+  handleFileUpload: PropTypes.func,
   isEditing: PropTypes.bool.isRequired
 };
 
