@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+myrecipes/parsed_recipe.json
+myrecipes/parsed_recipes.json

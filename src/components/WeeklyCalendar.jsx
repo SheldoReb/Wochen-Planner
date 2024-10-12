@@ -6,7 +6,7 @@ import RecipeSelectionModal from './RecipeSelectionModal';
 import { fetchFilteredRecipes, cleanDuplicateRecipes } from '../services/recipeService';
 import RecipeUploadForm from './RecipeUploadForm';
 
-const WeeklyCalendar = () => {
+const WeeklyCalendar = ({ onUpload }) => {
   const [recipes, setRecipes] = useState({
     Monday: null,
     Tuesday: null,
@@ -148,7 +148,7 @@ const WeeklyCalendar = () => {
       >
         {showUploadForm ? 'Hide Upload Form' : 'Show Upload Form'}
       </button>
-      {showUploadForm && <RecipeUploadForm />}
+      {showUploadForm && <RecipeUploadForm onUpload={onUpload} />}
 
       <Modal show={showModal} onHide={handleCancelRegenerate}>
         <Modal.Header closeButton>

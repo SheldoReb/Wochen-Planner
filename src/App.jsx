@@ -51,7 +51,7 @@ const App = () => {
 
   return (
     <div className="App">
-      <LandingPage onFilterChange={handleFilterChange} />
+      <LandingPage onFilterChange={handleFilterChange} onUpload={handleUpload} />
       {selectedRecipeId && <RecipeEditForm recipeId={selectedRecipeId} onEdit={handleEdit} />}
     </div>
   );
