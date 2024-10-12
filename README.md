@@ -2,6 +2,7 @@
 
 Meal Planner is a user-friendly web application designed to assist families in organizing their weekly meals efficiently. The application allows users to plan a weekly menu using recipes from a customizable database. It includes features such as recipe management, filtering, and database cleaning to ensure a smooth and personalized meal planning experience.
 
+
 ## Overview
 
 The Meal Planner application is built using a microservices architecture to ensure scalability and maintainability. The frontend is developed with React and Vite, providing a dynamic and responsive user interface. The backend is implemented using Node.js and Express, handling API requests and business logic, while MongoDB is used as the database to store recipes and user data. The application comprises the following components:
