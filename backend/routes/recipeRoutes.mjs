@@ -7,10 +7,11 @@ const router = express.Router();
 // Define a schema for recipe validation
 const recipeSchema = Joi.object({
   name: Joi.string().min(3).required(),
-  image: Joi.string().required(), // Allow any string for image
+  url: Joi.string().uri().required(), // Added url as required
+  image: Joi.string().optional(), // Made image optional
   prepTime: Joi.string().optional(),
   difficulty: Joi.string().valid('Easy', 'Medium', 'Hard').optional(),
-  cuisine: Joi.string().min(3).required(),
+  cuisine: Joi.string().min(3).optional(),
   dietaryRestrictions: Joi.string().optional(),
   mainIngredient: Joi.string().optional()
 });
