@@ -7,7 +7,7 @@ const router = express.Router();
 // Define a schema for recipe validation
 const recipeSchema = Joi.object({
   name: Joi.string().min(3).required(),
-  image: Joi.string().uri().optional(),
+  image: Joi.string().required(), // Allow any string for image
   prepTime: Joi.string().optional(),
   difficulty: Joi.string().valid('Easy', 'Medium', 'Hard').optional(),
   cuisine: Joi.string().min(3).required(),
@@ -45,7 +45,6 @@ router.post('/upload', async (req, res) => {
     return res.status(400).json({ message: 'Invalid data format. Expected an array of recipes.' });
   }
 
-  // Validate each recipe against the schema
   const invalidRecipes = recipes.filter(recipe => {
     const { error } = recipeSchema.validate(recipe);
     if (error) {
