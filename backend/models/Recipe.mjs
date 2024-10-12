@@ -5,8 +5,8 @@ const recipeSchema = new mongoose.Schema({
     url: { type: String, required: true }, // Added url as required
     image: { type: String }, // Made image optional
     prepTime: { type: String },
-    difficulty: { type: String },
-    cuisine: { type: String },
+    difficulty: { type: String },    
+    cuisine: { type: String, required: true },
     dietaryRestrictions: { type: [String] },
     mainIngredient: { type: String }
 });

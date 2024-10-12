@@ -7,11 +7,18 @@ const router = express.Router();
 // Define a schema for recipe validation
 const recipeSchema = Joi.object({
   name: Joi.string().min(3).required(),
-  url: Joi.string().uri().required(), // Added url as required
-  image: Joi.string().optional(), // Made image optional
+  url: Joi.string().required().custom((value, helpers) => {
+    try {
+      new URL(value);
+      return value;
+    } catch (err) {
+      return helpers.error('any.invalid');
+    }
+  }, 'URL validation'),
+  image: Joi.string().optional(),
   prepTime: Joi.string().optional(),
   difficulty: Joi.string().valid('Easy', 'Medium', 'Hard').optional(),
-  cuisine: Joi.string().min(3).optional(),
+  cuisine: Joi.string().min(3).required(),
   dietaryRestrictions: Joi.string().optional(),
   mainIngredient: Joi.string().optional()
 });
@@ -167,6 +174,37 @@ router.delete('/clean-duplicates', async (req, res) => {
     res.json({ message: 'Database cleaned successfully', duplicatesRemoved: totalRemoved });
   } catch (error) {
     console.error('Error cleaning duplicates:', error.message, error.stack);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add this new endpoint to fetch a random recipe with filters
+router.post('/random', async (req, res) => {
+  const { cuisineTypes, dietaryRestrictions, prepTime, difficulty, mainIngredient } = req.body;
+
+  try {
+    // Build the query based on filters
+    const query = {
+      ...(cuisineTypes && cuisineTypes.length > 0 && { cuisine: { $in: cuisineTypes } }),
+      ...(dietaryRestrictions && { dietaryRestrictions }),
+      ...(prepTime && { prepTime }),
+      ...(difficulty && { difficulty }),
+      ...(mainIngredient && { mainIngredient }),
+    };
+
+    // Fetch all recipes matching the filters
+    const recipes = await Recipe.find(query);
+
+    if (recipes.length === 0) {
+      return res.status(404).json({ error: 'No recipes found with the given filters' });
+    }
+
+    // Select a random recipe from the filtered list
+    const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+
+    res.json(randomRecipe);
+  } catch (error) {
+    console.error('Error fetching random recipe:', error.message, error.stack);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

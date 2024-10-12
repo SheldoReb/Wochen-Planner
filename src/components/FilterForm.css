@@ -9,8 +9,19 @@
   margin-bottom: 1rem;
 }
 
+.filter-form .filter-controls {
+  display: flex;
+  align-items: center;
+}
+
 .filter-form .cuisine-select {
-  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+  flex-grow: 1;
+}
+
+.filter-form .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
 }
 
 .filter-form .form-check {

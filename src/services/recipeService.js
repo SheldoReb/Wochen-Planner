@@ -108,3 +108,14 @@ export const fetchCuisineOptions = async () => {
     return [];
   }
 };
+
+// Add a function to fetch a random recipe with filters
+export const fetchRandomRecipe = async (filters) => {
+  try {
+    const response = await apiClient.post('/api/recipes/random', filters);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching random recipe:', error.message, error.stack);
+    throw error;
+  }
+};

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import WeeklyCalendar from './WeeklyCalendar';
-import FilterForm from './FilterForm'; // Import the FilterForm component
+import FilterForm from './FilterForm';
 import './LandingPage.css';
 
-const LandingPage = ({ onFilterChange, onUpload }) => {
-  const [showFilterForm, setShowFilterForm] = useState(false);
+const LandingPage = ({ onUpload }) => {
+  const [appliedFilters, setAppliedFilters] = useState({});
 
-  const toggleFilterForm = () => {
-    setShowFilterForm((prev) => !prev);
+  const handleFilterChange = (filters) => {
+    console.log('Filters applied:', filters);
+    setAppliedFilters(filters);
   };
 
   return (
@@ -16,14 +17,8 @@ const LandingPage = ({ onFilterChange, onUpload }) => {
         <h1>Meal Planner</h1>
         <p>Plan your meals for the week with ease!</p>
       </header>
-      <WeeklyCalendar onUpload={onUpload} />
-      <button
-        className="btn btn-secondary mt-4"
-        onClick={toggleFilterForm}
-      >
-        {showFilterForm ? 'Hide Filter' : 'Show Filter'}
-      </button>
-      {showFilterForm && <FilterForm onFilterChange={onFilterChange} />}
+      <FilterForm onFilterChange={handleFilterChange} />
+      <WeeklyCalendar onUpload={onUpload} appliedFilters={appliedFilters} />
     </div>
   );
 };
