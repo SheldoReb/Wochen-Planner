@@ -2,6 +2,7 @@ import express from 'express';
 import Recipe from '../models/Recipe.mjs';
 import Joi from 'joi';
 import WeeklyRecipes from '../models/WeeklyRecipes.js';
+import { getImageUrl } from '../utils/imageUtils.mjs'; // Import the function
 
 const router = express.Router();
 
@@ -15,12 +16,12 @@ const recipeSchema = Joi.object({
     } catch (err) {
       return helpers.error('any.invalid');
     }
-  }, 'URL validation'),
+  }),
   image: Joi.string().optional(),
   prepTime: Joi.string().optional(),
   difficulty: Joi.string().valid('Easy', 'Medium', 'Hard').optional(),
   cuisine: Joi.string().min(3).required(),
-  dietaryRestrictions: Joi.string().optional(),
+  dietaryRestrictions: Joi.array().items(Joi.string()).optional(),
   mainIngredient: Joi.string().optional()
 });
 
@@ -54,27 +55,13 @@ router.post('/upload', async (req, res) => {
     return res.status(400).json({ message: 'Invalid data format. Expected an array of recipes.' });
   }
 
-  const invalidRecipes = recipes.filter(recipe => {
-    const { error } = recipeSchema.validate(recipe);
-    if (error) {
-      console.log(`Validation error for recipe ${recipe.name}:`, error.details);
-      return true; // Mark as invalid
-    }
-    return false;
-  });
-
-  if (invalidRecipes.length > 0) {
-    console.log('Invalid recipes found:', invalidRecipes);
-    return res.status(400).json({ message: 'Some recipes are invalid', invalidRecipes });
-  }
-
   try {
-    // Check for duplicate recipes
     for (const recipe of recipes) {
-      const duplicate = await Recipe.findOne({ name: recipe.name, cuisine: recipe.cuisine });
-      if (duplicate) {
-        console.log(`Duplicate recipe found: ${recipe.name} - ${recipe.cuisine}`);
-        return res.status(409).json({ message: `Duplicate recipe found: ${recipe.name} - ${recipe.cuisine}` });
+      if (!recipe.image && recipe.url) {
+        const imageUrl = await getImageUrl(recipe.url);
+        if (imageUrl) {
+          recipe.image = imageUrl;
+        }
       }
     }
 
