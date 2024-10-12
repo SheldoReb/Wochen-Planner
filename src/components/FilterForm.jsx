@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import Select from 'react-select';
 import './FilterForm.css';
 import { fetchCuisineOptions } from '../services/recipeService';
 
@@ -26,9 +27,10 @@ const FilterForm = ({ onFilterChange }) => {
           console.log('Fetching cuisine options...');
         }
         const cuisines = await fetchCuisineOptions();
-        setCuisineOptions(cuisines);
+        const formattedCuisines = cuisines.map(cuisine => ({ value: cuisine, label: cuisine }));
+        setCuisineOptions(formattedCuisines);
         if (process.env.NODE_ENV === 'development') {
-          console.log('Cuisine options set:', cuisines);
+          console.log('Cuisine options set:', formattedCuisines);
         }
       } catch (error) {
         console.error('Error fetching cuisine options:', error.message, error.stack);
@@ -38,22 +40,21 @@ const FilterForm = ({ onFilterChange }) => {
     getCuisineOptions();
   }, []);
 
+  const handleCuisineChange = (selectedOptions) => {
+    const selectedCuisines = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      cuisineTypes: selectedCuisines,
+    }));
+  };
+
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, type, checked } = e.target;
     if (type === 'checkbox') {
-      if (name in filters.days) {
-        setFilters((prevFilters) => ({
-          ...prevFilters,
-          days: { ...prevFilters.days, [name]: checked },
-        }));
-      } else {
-        setFilters((prevFilters) => {
-          const newCuisineTypes = checked
-            ? [...prevFilters.cuisineTypes, value]
-            : prevFilters.cuisineTypes.filter((cuisine) => cuisine !== value);
-          return { ...prevFilters, cuisineTypes: newCuisineTypes };
-        });
-      }
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        days: { ...prevFilters.days, [name]: checked },
+      }));
     }
   };
 
@@ -69,21 +70,13 @@ const FilterForm = ({ onFilterChange }) => {
     <form className="filter-form" onSubmit={handleSubmit}>
       <div className="form-group">
         <label>Cuisine Types</label>
-        <div className="cuisine-options">
-          {cuisineOptions.map((cuisine) => (
-            <div key={cuisine} className="form-check">
-              <input
-                type="checkbox"
-                name="cuisineType"
-                value={cuisine}
-                checked={filters.cuisineTypes.includes(cuisine)}
-                onChange={handleChange}
-                className="form-check-input"
-              />
-              <label className="form-check-label">{cuisine}</label>
-            </div>
-          ))}
-        </div>
+        <Select
+          isMulti
+          options={cuisineOptions}
+          value={cuisineOptions.filter(option => filters.cuisineTypes.includes(option.value))}
+          onChange={handleCuisineChange}
+          className="cuisine-select"
+        />
       </div>
       <div className="form-group">
         <label>Days to Apply</label>

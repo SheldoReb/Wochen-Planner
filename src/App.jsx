@@ -44,9 +44,14 @@ const App = () => {
     }
   };
 
+  const handleFilterChange = (filters) => {
+    console.log('Filters applied:', filters);
+    // Implement the logic to handle filter changes
+  };
+
   return (
     <div className="App">
-      <LandingPage />
+      <LandingPage onFilterChange={handleFilterChange} />
       {selectedRecipeId && <RecipeEditForm recipeId={selectedRecipeId} onEdit={handleEdit} />}
     </div>
   );
