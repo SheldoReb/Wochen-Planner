@@ -1,29 +1,41 @@
+/* Updated src/components/FilterForm.css */
+
 .filter-form {
-  margin-bottom: 2rem;
-  max-width: 400px; /* Reduced the maximum width */
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .filter-form .form-group {
   margin-bottom: 1rem;
 }
 
+.filter-form .filter-controls {
+  display: flex;
+  align-items: center;
+}
+
+.filter-form .cuisine-select {
+  margin-right: 0.5rem;
+  flex-grow: 1;
+}
+
+.filter-form .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.filter-form .form-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.filter-form input[type="checkbox"] {
+  transform: scale(1);
+  margin-right: 8px;
+}
+
 .filter-form label {
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.filter-form input,
-.filter-form select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.form-check {
-  margin-bottom: 0.5rem;
-  display: inline-block;
-  width: 45%; /* Reduced the width of checkboxes */
+  font-size: 14px;
+  margin: 0;
 }

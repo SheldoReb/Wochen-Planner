@@ -6,6 +6,7 @@ import './RecipeUploadForm.css';
 const RecipeUploadForm = ({ onUpload }) => {
   const [recipe, setRecipe] = useState({
     name: '',
+    url: '', // Initialize url with an empty string
     image: '',
     prepTime: '',
     difficulty: '',
@@ -27,6 +28,7 @@ const RecipeUploadForm = ({ onUpload }) => {
       await onUpload([recipe]);
       setRecipe({
         name: '',
+        url: '', // Reset url to an empty string
         image: '',
         prepTime: '',
         difficulty: '',

@@ -1,83 +1,64 @@
-import React, { useState } from 'react';
-import './WeeklyCalendar.css';
-import RecipeCard from './RecipeCard';
-import { Modal } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { fetchRandomRecipe, fetchFilteredRecipes, cleanDuplicateRecipes, saveWeeklyRecipes, loadWeeklyRecipes } from '../services/recipeService';
 import RecipeSelectionModal from './RecipeSelectionModal';
-import { fetchFilteredRecipes, cleanDuplicateRecipes } from '../services/recipeService';
 import RecipeUploadForm from './RecipeUploadForm';
+import { Modal } from 'react-bootstrap';
 
-const WeeklyCalendar = () => {
-  const [recipes, setRecipes] = useState({
-    Monday: null,
-    Tuesday: null,
-    Wednesday: null,
-    Thursday: null,
-    Friday: null,
-    Saturday: null,
-    Sunday: null
-  });
-
+const WeeklyCalendar = ({ onUpload, appliedFilters }) => {
+  const [recipes, setRecipes] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalDay, setModalDay] = useState('');
   const [showRecipeSelectionModal, setShowRecipeSelectionModal] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
 
-  const regenerateRecipe = (day) => {
-    console.log(`Regenerating recipe for ${day}`);
-    const newRecipe = {
-      name: `New Recipe for ${day}`,
-      image: 'https://via.placeholder.com/150',
-      prepTime: '30 mins',
-      difficulty: 'Medium',
-      cuisine: 'International'
+  useEffect(() => {
+    const loadRecipes = async () => {
+      try {
+        const loadedRecipes = await loadWeeklyRecipes();
+        const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        const filteredRecipes = Object.keys(loadedRecipes)
+          .filter(day => validDays.includes(day))
+          .reduce((obj, key) => {
+            obj[key] = loadedRecipes[key];
+            return obj;
+          }, {});
+        setRecipes(filteredRecipes);
+      } catch (error) {
+        console.error('Error loading weekly recipes:', error.message, error.stack);
+      }
     };
-    setRecipes(prevRecipes => ({ ...prevRecipes, [day]: newRecipe }));
-  };
 
-  const handleRegenerateClick = (day) => {
-    setModalDay(day);
-    setShowModal(true);
-  };
+    loadRecipes();
+  }, []);
 
-  const handleConfirmRegenerate = () => {
-    try {
-      Object.keys(recipes).forEach(day => {
-        regenerateRecipe(day);
-      });
-      console.log(`Recipes regenerated for ${modalDay}`);
-    } catch (error) {
-      console.error('Error regenerating recipes:', error.message, error.stack);
+  useEffect(() => {
+    if (appliedFilters && Object.keys(appliedFilters).length > 0) {
+      console.log('Filters applied:', appliedFilters);
     }
-    setShowModal(false);
-  };
+  }, [appliedFilters]);
 
-  const handleCancelRegenerate = () => {
-    setShowModal(false);
-  };
-
-  const determineDaysToUpdate = (filters) => {
-    return filters.days.All
-      ? Object.keys(recipes)
-      : Object.keys(filters.days).filter((day) => filters.days[day]);
-  };
-
-  const handleFilterChange = async (filters) => {
-    try {
-      console.log('Applying filters:', filters);
-      const filteredRecipes = await fetchFilteredRecipes({ cuisineTypes: filters.cuisineTypes });
-      console.log('Filtered recipes:', filteredRecipes);
-
+  const handleRegenerateClick = async (day) => {
+    if (day === 'All') {
+      // Regenerate all days
       const updatedRecipes = { ...recipes };
-      const daysToUpdate = determineDaysToUpdate(filters);
-
-      daysToUpdate.forEach((day, index) => {
-        updatedRecipes[day] = filteredRecipes[index] || null;
-        console.log(`Assigned recipe to ${day}:`, updatedRecipes[day]);
-      });
-
+      for (const dayKey of Object.keys(recipes)) {
+        try {
+          const randomRecipe = await fetchRandomRecipe(appliedFilters);
+          updatedRecipes[dayKey] = randomRecipe;
+        } catch (error) {
+          console.error(`Error regenerating recipe for ${dayKey}:`, error);
+          updatedRecipes[dayKey] = null;
+        }
+      }
       setRecipes(updatedRecipes);
-    } catch (error) {
-      console.error('Error applying filters:', error.message, error.stack);
+    } else {
+      // Regenerate single day
+      try {
+        const randomRecipe = await fetchRandomRecipe(appliedFilters);
+        setRecipes(prevRecipes => ({ ...prevRecipes, [day]: randomRecipe }));
+      } catch (error) {
+        console.error(`Error regenerating recipe for ${day}:`, error);
+      }
     }
   };
 
@@ -101,15 +82,55 @@ const WeeklyCalendar = () => {
     setShowUploadForm(!showUploadForm);
   };
 
+  const handleSaveWeek = async () => {
+    try {
+      await saveWeeklyRecipes(recipes);
+      alert('Weekly recipes saved successfully.');
+      const loadedRecipes = await loadWeeklyRecipes(); // Reload the recipes        
+      const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      const filteredRecipes = Object.keys(loadedRecipes)
+        .filter(day => validDays.includes(day))
+        .reduce((obj, key) => {
+          obj[key] = loadedRecipes[key];
+          return obj;
+        }, {});
+      setRecipes(filteredRecipes);
+    } catch (error) {
+      console.error('Error saving weekly recipes:', error.message, error.stack);
+      alert('Failed to save weekly recipes. Please try again.');
+    }
+  };
+
   return (
     <div className="weekly-calendar container">
       <div className="row">
         {Object.keys(recipes).map((day) => (
-          <div key={day} className="col-md-4 col-lg-3 mb-4">
-            <div className="day-card card">
-              <div className="card-body">
-                <h5 className="card-title">{day}</h5>
-                <RecipeCard recipe={recipes[day]} />
+          <div key={day} className="col-sm-6 col-md-4 col-lg-3">
+            <div className="card mb-4">
+              <div className="card-header">{day}</div>
+              <div className="card-body text-center">
+                {recipes[day] ? (
+                  <>
+                    <img
+                      src={recipes[day].image || '/path/to/default/image.jpg'}
+                      alt={recipes[day].name}
+                      className="img-fluid mb-2"
+                    />
+                    <h5 className="card-title">{recipes[day].name}</h5>
+                    {recipes[day].url && (
+                      <a
+                        href={recipes[day].url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-info btn-sm mt-2"
+                      >
+                        View Recipe
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  <p>No recipe assigned</p>
+                )}
                 <button
                   className="btn btn-warning btn-sm mt-2"
                   onClick={() => handleRegenerateClick(day)}
@@ -148,9 +169,15 @@ const WeeklyCalendar = () => {
       >
         {showUploadForm ? 'Hide Upload Form' : 'Show Upload Form'}
       </button>
-      {showUploadForm && <RecipeUploadForm />}
+      {showUploadForm && <RecipeUploadForm onUpload={onUpload} />}
+      <button
+        className="btn btn-success mt-4"
+        onClick={handleSaveWeek}
+      >
+        Save Week
+      </button>
 
-      <Modal show={showModal} onHide={handleCancelRegenerate}>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Regeneration</Modal.Title>
         </Modal.Header>
@@ -158,10 +185,10 @@ const WeeklyCalendar = () => {
           Are you sure you want to regenerate the recipe for {modalDay}?
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-secondary" onClick={handleCancelRegenerate}>
+          <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
             Cancel
           </button>
-          <button className="btn btn-primary" onClick={handleConfirmRegenerate}>
+          <button className="btn btn-primary" onClick={() => handleRegenerateClick(modalDay)}>
             Confirm
           </button>
         </Modal.Footer>
