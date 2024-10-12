@@ -1,24 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { fetchRandomRecipe, fetchFilteredRecipes, cleanDuplicateRecipes } from '../services/recipeService';
+import { fetchRandomRecipe, fetchFilteredRecipes, cleanDuplicateRecipes, saveWeeklyRecipes, loadWeeklyRecipes } from '../services/recipeService';
 import RecipeSelectionModal from './RecipeSelectionModal';
 import RecipeUploadForm from './RecipeUploadForm';
 import { Modal } from 'react-bootstrap';
 
 const WeeklyCalendar = ({ onUpload, appliedFilters }) => {
-  const [recipes, setRecipes] = useState({
-    Monday: null,
-    Tuesday: null,
-    Wednesday: null,
-    Thursday: null,
-    Friday: null,
-    Saturday: null,
-    Sunday: null
-  });
-
+  const [recipes, setRecipes] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalDay, setModalDay] = useState('');
   const [showRecipeSelectionModal, setShowRecipeSelectionModal] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
+
+  useEffect(() => {
+    const loadRecipes = async () => {
+      try {
+        const loadedRecipes = await loadWeeklyRecipes();
+        const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        const filteredRecipes = Object.keys(loadedRecipes)
+          .filter(day => validDays.includes(day))
+          .reduce((obj, key) => {
+            obj[key] = loadedRecipes[key];
+            return obj;
+          }, {});
+        setRecipes(filteredRecipes);
+      } catch (error) {
+        console.error('Error loading weekly recipes:', error.message, error.stack);
+      }
+    };
+
+    loadRecipes();
+  }, []);
 
   useEffect(() => {
     if (appliedFilters && Object.keys(appliedFilters).length > 0) {
@@ -69,6 +80,25 @@ const WeeklyCalendar = ({ onUpload, appliedFilters }) => {
 
   const toggleUploadForm = () => {
     setShowUploadForm(!showUploadForm);
+  };
+
+  const handleSaveWeek = async () => {
+    try {
+      await saveWeeklyRecipes(recipes);
+      alert('Weekly recipes saved successfully.');
+      const loadedRecipes = await loadWeeklyRecipes(); // Reload the recipes        
+      const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      const filteredRecipes = Object.keys(loadedRecipes)
+        .filter(day => validDays.includes(day))
+        .reduce((obj, key) => {
+          obj[key] = loadedRecipes[key];
+          return obj;
+        }, {});
+      setRecipes(filteredRecipes);
+    } catch (error) {
+      console.error('Error saving weekly recipes:', error.message, error.stack);
+      alert('Failed to save weekly recipes. Please try again.');
+    }
   };
 
   return (
@@ -140,6 +170,12 @@ const WeeklyCalendar = ({ onUpload, appliedFilters }) => {
         {showUploadForm ? 'Hide Upload Form' : 'Show Upload Form'}
       </button>
       {showUploadForm && <RecipeUploadForm onUpload={onUpload} />}
+      <button
+        className="btn btn-success mt-4"
+        onClick={handleSaveWeek}
+      >
+        Save Week
+      </button>
 
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>

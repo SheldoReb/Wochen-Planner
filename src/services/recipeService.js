@@ -119,3 +119,25 @@ export const fetchRandomRecipe = async (filters) => {
     throw error;
   }
 };
+
+export const saveWeeklyRecipes = async (weeklyRecipes) => {
+  try {
+    const response = await apiClient.post('/api/recipes/weekly-recipes', weeklyRecipes);
+    console.log('Weekly recipes saved successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error saving weekly recipes:', error.message, error.stack);
+    throw error;
+  }
+};
+
+export const loadWeeklyRecipes = async () => {
+  try {
+    const response = await apiClient.get('/api/recipes/weekly-recipes');
+    console.log('Weekly recipes loaded successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error loading weekly recipes:', error.message, error.stack);
+    throw error;
+  }
+};

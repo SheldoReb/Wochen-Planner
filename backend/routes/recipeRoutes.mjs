@@ -215,9 +215,12 @@ router.post('/weekly-recipes', async (req, res) => {
   const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = req.body;
 
   try {
-    const weeklyRecipes = new WeeklyRecipes({ monday, tuesday, wednesday, thursday, friday, saturday, sunday });
-    await weeklyRecipes.save();
-    res.status(201).json({ message: 'Weekly recipes saved successfully' });
+    const weeklyRecipes = await WeeklyRecipes.findOneAndUpdate(
+      {},
+      { monday, tuesday, wednesday, thursday, friday, saturday, sunday },
+      { new: true, upsert: true } // Create a new document if none exists
+    );
+    res.status(201).json({ message: 'Weekly recipes saved successfully', weeklyRecipes });
   } catch (error) {
     console.error('Error saving weekly recipes:', error.message, error.stack);
     res.status(500).json({ error: 'Internal server error' });
@@ -227,7 +230,7 @@ router.post('/weekly-recipes', async (req, res) => {
 // Load weekly recipes
 router.get('/weekly-recipes', async (req, res) => {
   try {
-    const weeklyRecipes = await WeeklyRecipes.findOne().populate('monday tuesday wednesday thursday friday saturday sunday');
+    const weeklyRecipes = await WeeklyRecipes.findOne();
     res.json(weeklyRecipes);
   } catch (error) {
     console.error('Error loading weekly recipes:', error.message, error.stack);
