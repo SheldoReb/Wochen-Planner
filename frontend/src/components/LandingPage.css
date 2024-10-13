@@ -1,27 +1,37 @@
-/* src/components/LandingPage.css */
+/* frontend/src/components/LandingPage.css */
 .landing-page {
+  display: flex;
   text-align: center;
   padding: 2rem;
 }
 
-.landing-header {
-  margin-bottom: 2rem;
+.main-content {
+  padding: 20px;
+  width: 100%;
+  transition: margin-left 0.3s ease;
 }
 
-.landing-header h1 {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
+.main-content.with-sidebar {
+  margin-left: 250px; /* Width of the sidebar */
 }
 
-.landing-header p {
-  font-size: 1.2rem;
-  color: #666;
+.main-content.full-width {
+  margin-left: 0;
 }
 
-.days-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+.toggle-sidebar-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.toggle-sidebar-button:hover {
+  background-color: #0056b3;
 }

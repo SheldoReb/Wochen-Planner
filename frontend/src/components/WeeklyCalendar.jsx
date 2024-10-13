@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchRandomRecipe, fetchFilteredRecipes, cleanDuplicateRecipes, saveWeeklyRecipes, loadWeeklyRecipes } from '../services/recipeService';
+import { fetchRandomRecipe, saveWeeklyRecipes, loadWeeklyRecipes } from '../services/recipeService';
 import RecipeSelectionModal from './RecipeSelectionModal';
 import RecipeUploadForm from './RecipeUploadForm';
 import { Modal } from 'react-bootstrap';
@@ -7,7 +7,7 @@ import DayCard from './DayCard';
 import { getWeekNumber, formatDateGerman } from '../utils/dateUtils';
 import './WeeklyCalendar.css';
 
-const WeeklyCalendar = ({ onUpload, appliedFilters }) => {
+const WeeklyCalendar = ({ onUpload, appliedFilters, selectedRecipes }) => {
   const [recipes, setRecipes] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalDay, setModalDay] = useState('');
@@ -62,7 +62,7 @@ const WeeklyCalendar = ({ onUpload, appliedFilters }) => {
       const updatedRecipes = { ...recipes };
       for (const dayKey of Object.keys(recipes)) {
         try {
-          const randomRecipe = await fetchRandomRecipe(appliedFilters);
+          const randomRecipe = await fetchRandomRecipe(appliedFilters, selectedRecipes);
           updatedRecipes[dayKey] = randomRecipe;
         } catch (error) {
           console.error(`Error regenerating recipe for ${dayKey}:`, error.message);
@@ -71,7 +71,7 @@ const WeeklyCalendar = ({ onUpload, appliedFilters }) => {
       setRecipes(updatedRecipes);
     } else {
       try {
-        const randomRecipe = await fetchRandomRecipe(appliedFilters);
+        const randomRecipe = await fetchRandomRecipe(appliedFilters, selectedRecipes);
         setRecipes(prev => ({ ...prev, [day]: randomRecipe }));
       } catch (error) {
         console.error(`Error regenerating recipe for ${day}:`, error.message);

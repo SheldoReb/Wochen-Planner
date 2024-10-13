@@ -1,0 +1,82 @@
+/* frontend/src/components/RecipeSelectionSidebar.css */
+.recipe-selection-sidebar {
+  width: 250px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  border-right: 1px solid #dee2e6;
+  z-index: 999; /* Ensure it stays above other elements */
+}
+
+.recipe-selection-sidebar h2 {
+  margin-bottom: 15px;
+}
+
+.cuisine-group {
+  margin-bottom: 10px;
+}
+
+.cuisine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #e9ecef;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cuisine-header:hover {
+  background-color: #ced4da;
+}
+
+.recipes-list {
+  margin-top: 5px;
+  padding-left: 10px;
+}
+
+.recipe-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.recipe-item:hover {
+  background-color: #e2e6ea;
+}
+
+.recipe-item.selected {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.recipe-item img {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.apply-filter-button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 10px;
+  background-color: #28a745;
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.apply-filter-button:hover {
+  background-color: #218838;
+}
