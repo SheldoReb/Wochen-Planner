@@ -4,22 +4,22 @@ Meal Planner is a user-friendly web application designed to assist families in o
 
 ## Overview
 
-The Meal Planner application is built using a microservices architecture to ensure scalability and maintainability. The frontend is developed with React and Vite, providing a dynamic and responsive user interface. The backend is implemented using Node.js and Express, handling API requests and business logic, while MongoDB is used as the database to store recipes and user data. The application comprises the following components:
+Meal Planner is built using a microservices architecture to ensure scalability and maintainability. The application comprises the following components:
 
-1. **Frontend**: Developed with React, utilizing Vite for fast development and hot-reloading. It communicates with the backend via RESTful APIs.
-2. **Backend**: Built with Node.js and Express, managing user authentication, recipe management, and meal planning features. Mongoose is used as the ORM to interact with MongoDB.
-3. **Database**: MongoDB stores recipe data, user information, and meal plans, accessed via the Mongoose ORM.
-4. **Authentication**: Session-based authentication using express-session and bcrypt for password hashing.
-5. **API**: RESTful API endpoints for managing recipes, meal plans, and user data.
-6. **Deployment**: The application is containerized using Docker for easy deployment and scalability.
+1. **Frontend**: Developed with React and Vite, providing a dynamic and responsive user interface. It communicates with the backend via RESTful APIs.
+2. **Backend**: Built with Node.js and Express, managing API requests, user authentication, and business logic. It interacts with MongoDB using Mongoose.
+3. **Database**: MongoDB stores recipe data, user information, and meal plans.
+4. **Containerization**: Docker is used to containerize the frontend, backend, and MongoDB services, orchestrated using Docker Compose.
 
-The project structure includes the following key directories and files:
-
-- `frontend/`: Contains the React application source code.
-- `backend/`: Contains the Node.js backend application source code.
-- `docker-compose.yml`: Orchestrates the build and deployment of backend, frontend, and MongoDB services.
-- `Dockerfile`: Defines the Docker image for the application.
-- `.env`: Configuration file for environment variables.
+```mermaid
+graph TD
+    A[Frontend] -->|REST API| B[Backend]
+    B --> C[MongoDB]
+    A --> D[Docker]
+    B --> D
+    C --> D
+    D[Docker Compose] --> E[Host Machine]
+```
 
 ## Features
 
@@ -34,7 +34,7 @@ Meal Planner offers a range of features designed to enhance the meal planning pr
 - **Duplicate Detection**: Notifies users of duplicate recipes during uploads and offers options to replace or cancel.
 - **Frontend Enhancements**: Dropdown menu for cuisine type filter, checkbox for selecting days to apply filters, and improved layout for user-friendly experience.
 
-## Getting started
+## Getting Started
 
 ### Requirements
 
@@ -49,11 +49,23 @@ To run the Meal Planner application, the following technologies are required:
 To set up and run the Meal Planner application, follow these steps:
 
 1. Clone the repository to your local machine.
+    ```bash
+    git clone https://github.com/yourusername/meal-planner.git
+    ```
 2. Navigate to the project root directory.
+    ```bash
+    cd meal-planner
+    ```
 3. Ensure Docker is installed and running on your system.
+    ```bash
+    docker --version
+    ```
 4. Run `docker-compose up` to build and start the application containers.
-5. Access the application via your web browser at `http://localhost:80`.
+    ```bash
+    docker-compose up
+    ```
+5. Access the application via your web browser at `http://localhost:9988`.
 
-### License
+## License
 
 The project is proprietary. Copyright (c) 2024.
