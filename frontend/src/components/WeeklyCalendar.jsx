@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { fetchRandomRecipe, saveWeeklyRecipes, loadWeeklyRecipes } from '../services/recipeService';
 import RecipeSelectionModal from './RecipeSelectionModal';
 import RecipeUploadForm from './RecipeUploadForm';
@@ -7,7 +8,7 @@ import DayCard from './DayCard';
 import { getWeekNumber, formatDateGerman } from '../utils/dateUtils';
 import './WeeklyCalendar.css';
 
-const WeeklyCalendar = ({ onUpload, appliedFilters, selectedRecipes }) => {
+const WeeklyCalendar = ({ onUpload, appliedFilters, selectedRecipes, isFilterApplied }) => {
   const [recipes, setRecipes] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalDay, setModalDay] = useState('');
@@ -22,15 +23,13 @@ const WeeklyCalendar = ({ onUpload, appliedFilters, selectedRecipes }) => {
   useEffect(() => {
     const loadRecipes = async () => {
       try {
-        const loadedRecipes = await loadWeeklyRecipes();
-        const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-        const filteredRecipes = Object.keys(loadedRecipes)
-          .filter(day => validDays.includes(day))
-          .reduce((obj, key) => {
-            obj[key] = loadedRecipes[key];
-            return obj;
-          }, {});
-        setRecipes(filteredRecipes);
+        const initialRecipes = {};
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        for (const day of days) {
+          const recipe = await fetchRandomRecipe(isFilterApplied ? appliedFilters.selectedRecipes : []);
+          initialRecipes[day] = recipe;
+        }
+        setRecipes(initialRecipes);
 
         // Set current week dates
         const today = new Date();
@@ -48,7 +47,7 @@ const WeeklyCalendar = ({ onUpload, appliedFilters, selectedRecipes }) => {
     };
 
     loadRecipes();
-  }, []);
+  }, [appliedFilters.selectedRecipes, isFilterApplied]);
 
   useEffect(() => {
     if (appliedFilters && Object.keys(appliedFilters).length > 0) {
@@ -57,25 +56,29 @@ const WeeklyCalendar = ({ onUpload, appliedFilters, selectedRecipes }) => {
   }, [appliedFilters]);
 
   const handleRegenerateClick = async (day) => {
-    if (day === 'All') {
-      // Regenerate all days
-      const updatedRecipes = { ...recipes };
-      for (const dayKey of Object.keys(recipes)) {
-        try {
-          const randomRecipe = await fetchRandomRecipe(appliedFilters, selectedRecipes);
-          updatedRecipes[dayKey] = randomRecipe;
-        } catch (error) {
-          console.error(`Error regenerating recipe for ${dayKey}:`, error.message);
-        }
+    try {
+      const newRecipe = await fetchRandomRecipe(isFilterApplied ? appliedFilters.selectedRecipes : []);
+      setRecipes((prevRecipes) => ({
+        ...prevRecipes,
+        [day]: newRecipe,
+      }));
+      console.log(`Recipe for ${day} regenerated:`, newRecipe);
+    } catch (error) {
+      console.error(`Error regenerating recipe for ${day}:`, error.message, error.stack);
+    }
+  };
+
+  const handleRegenerateAll = async () => {
+    try {
+      const updatedRecipes = {};
+      for (const day of Object.keys(recipes)) {
+        const randomRecipe = await fetchRandomRecipe(isFilterApplied ? appliedFilters.selectedRecipes : []);
+        updatedRecipes[day] = randomRecipe;
       }
       setRecipes(updatedRecipes);
-    } else {
-      try {
-        const randomRecipe = await fetchRandomRecipe(appliedFilters, selectedRecipes);
-        setRecipes(prev => ({ ...prev, [day]: randomRecipe }));
-      } catch (error) {
-        console.error(`Error regenerating recipe for ${day}:`, error.message);
-      }
+      console.log('All recipes regenerated with selected filters.');
+    } catch (error) {
+      console.error('Error regenerating all recipes:', error.message, error.stack);
     }
   };
 
@@ -138,7 +141,7 @@ const WeeklyCalendar = ({ onUpload, appliedFilters, selectedRecipes }) => {
       <div className="action-buttons">
         <button
           className="btn btn-danger mt-4"
-          onClick={() => handleRegenerateClick('All')}
+          onClick={handleRegenerateAll}
         >
           Regenerate All
         </button>
@@ -190,6 +193,19 @@ const WeeklyCalendar = ({ onUpload, appliedFilters, selectedRecipes }) => {
       />
     </div>
   );
+};
+
+WeeklyCalendar.propTypes = {
+  appliedFilters: PropTypes.shape({
+    selectedRecipes: PropTypes.array,
+  }),
+  isFilterApplied: PropTypes.bool.isRequired,
+};
+
+WeeklyCalendar.defaultProps = {
+  appliedFilters: {
+    selectedRecipes: [],
+  },
 };
 
 export default WeeklyCalendar;

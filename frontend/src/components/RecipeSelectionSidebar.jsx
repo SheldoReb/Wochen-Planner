@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { fetchAllRecipes } from '../services/recipeService';
 import './RecipeSelectionSidebar.css'; // Import CSS for styling
 
-const RecipeSelectionSidebar = ({ selectedRecipes, setSelectedRecipes }) => {
+const RecipeSelectionSidebar = ({ selectedRecipes, setSelectedRecipes, onApplyFilter }) => {
   const [recipes, setRecipes] = useState([]);
   const [groupedRecipes, setGroupedRecipes] = useState({});
   const [expandedCuisines, setExpandedCuisines] = useState({});
+  const [isFilterApplied, setIsFilterApplied] = useState(false);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -45,9 +47,12 @@ const RecipeSelectionSidebar = ({ selectedRecipes, setSelectedRecipes }) => {
   };
 
   const handleApplyFilter = () => {
-    // Implement filter application logic if needed
-    // For example, lifting state up or notifying parent component
     console.log('Selected Recipes:', selectedRecipes);
+    onApplyFilter(selectedRecipes, isFilterApplied);
+  };
+
+  const handleCheckboxChange = (e) => {
+    setIsFilterApplied(e.target.checked);
   };
 
   return (
@@ -55,10 +60,7 @@ const RecipeSelectionSidebar = ({ selectedRecipes, setSelectedRecipes }) => {
       <h2>Filter Recipes by Cuisine</h2>
       {Object.keys(groupedRecipes).map((cuisine) => (
         <div key={cuisine} className="cuisine-group">
-          <div
-            className="cuisine-header"
-            onClick={() => toggleCuisine(cuisine)}
-          >
+          <div className="cuisine-header" onClick={() => toggleCuisine(cuisine)}>
             <span>{cuisine}</span>
             <span>{expandedCuisines[cuisine] ? '-' : '+'}</span>
           </div>
@@ -67,17 +69,10 @@ const RecipeSelectionSidebar = ({ selectedRecipes, setSelectedRecipes }) => {
               {groupedRecipes[cuisine].map((recipe) => (
                 <div
                   key={recipe._id}
-                  className={`recipe-item ${
-                    selectedRecipes.some((r) => r._id === recipe._id)
-                      ? 'selected'
-                      : ''
-                  }`}
+                  className={`recipe-item ${selectedRecipes.some((r) => r._id === recipe._id) ? 'selected' : ''}`}
                   onClick={() => handleRecipeClick(recipe)}
                 >
-                  <img
-                    src={recipe.image || 'default-thumbnail.jpg'}
-                    alt={recipe.name}
-                  />
+                  <img src={recipe.image || 'default-thumbnail.jpg'} alt={recipe.name} />
                   <p>{recipe.name}</p>
                 </div>
               ))}
@@ -85,11 +80,21 @@ const RecipeSelectionSidebar = ({ selectedRecipes, setSelectedRecipes }) => {
           )}
         </div>
       ))}
+      <div className="filter-checkbox">
+        <input type="checkbox" id="applyFilter" checked={isFilterApplied} onChange={handleCheckboxChange} />
+        <label htmlFor="applyFilter">Apply Selected Recipes Filter</label>
+      </div>
       <button className="apply-filter-button" onClick={handleApplyFilter}>
         Apply Filter
       </button>
     </div>
   );
+};
+
+RecipeSelectionSidebar.propTypes = {
+  selectedRecipes: PropTypes.array.isRequired,
+  setSelectedRecipes: PropTypes.func.isRequired,
+  onApplyFilter: PropTypes.func.isRequired,
 };
 
 export default RecipeSelectionSidebar;
