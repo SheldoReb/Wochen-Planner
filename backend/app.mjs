@@ -19,8 +19,9 @@ mongoose.connect('mongodb://sheldor:Sheldon0@192.168.178.19:27778/meal-planner',
 });
 
 app.use(cors({
-  origin: ['http://localhost', 'http://localhost:5173', 'http://frontend:80'], // Use service name for Docker
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: ['http://localhost', 'http://localhost:5173', 'http://192.168.178.19:9988'], // Add the frontend origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight requests
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
   credentials: true
 }));
 
