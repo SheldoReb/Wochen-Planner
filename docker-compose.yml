@@ -13,7 +13,7 @@ services:
 
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "9988:80"
