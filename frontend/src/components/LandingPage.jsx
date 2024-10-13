@@ -18,6 +18,7 @@ const LandingPage = ({ onUpload }) => {
         <p>Plan your meals for the week with ease!</p>
       </header>
       <FilterForm onFilterChange={handleFilterChange} />
+      {/* Removed the days-container to eliminate duplicate week display */}
       <WeeklyCalendar onUpload={onUpload} appliedFilters={appliedFilters} />
     </div>
   );
