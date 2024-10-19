@@ -33,7 +33,7 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Connect to MongoDB
-mongoose.connect('mongodb://sheldor:Sheldon0@192.168.178.19:27778/meal-planner-test', {
+mongoose.connect('mongodb://sheldor:Sheldon0@192.168.178.19:27778/meal-planner', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   authSource: 'admin',
