@@ -23,7 +23,6 @@ const WeeklyCalendar = () => {
   const [showUploadForm, setShowUploadForm] = useState(false);
 
   const regenerateRecipe = (day) => {
-    console.log(`Regenerating recipe for ${day}`);
     const newRecipe = {
       name: `New Recipe for ${day}`,
       image: 'https://via.placeholder.com/150',
@@ -44,7 +43,6 @@ const WeeklyCalendar = () => {
       Object.keys(recipes).forEach(day => {
         regenerateRecipe(day);
       });
-      console.log(`Recipes regenerated for ${modalDay}`);
     } catch (error) {
       console.error('Error regenerating recipes:', error.message, error.stack);
     }
@@ -63,16 +61,13 @@ const WeeklyCalendar = () => {
 
   const handleFilterChange = async (filters) => {
     try {
-      console.log('Applying filters:', filters);
       const filteredRecipes = await fetchFilteredRecipes({ cuisineTypes: filters.cuisineTypes });
-      console.log('Filtered recipes:', filteredRecipes);
 
       const updatedRecipes = { ...recipes };
       const daysToUpdate = determineDaysToUpdate(filters);
 
       daysToUpdate.forEach((day, index) => {
         updatedRecipes[day] = filteredRecipes[index] || null;
-        console.log(`Assigned recipe to ${day}:`, updatedRecipes[day]);
       });
 
       setRecipes(updatedRecipes);
@@ -83,7 +78,6 @@ const WeeklyCalendar = () => {
 
   const handleSelectRecipe = (recipe) => {
     setRecipes(prevRecipes => ({ ...prevRecipes, [modalDay]: recipe }));
-    console.log(`Recipe assigned to ${modalDay}:`, recipe);
     setShowRecipeSelectionModal(false);
   };
 

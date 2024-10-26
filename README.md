@@ -34,7 +34,7 @@ Meal Planner offers a range of features designed to enhance the meal planning pr
 - **Duplicate Detection**: Notifies users of duplicate recipes during uploads and offers options to replace or cancel.
 - **Frontend Enhancements**: Dropdown menu for cuisine type filter, checkbox for selecting days to apply filters, and improved layout for user-friendly experience.
 
-## Getting started
+## Getting Started
 
 ### Requirements
 
